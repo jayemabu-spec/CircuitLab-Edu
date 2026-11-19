@@ -1,3 +1,7 @@
+# Test artifacts
+.vitest/
+*.json.bak
+
 # Logs
 logs
 *.log
