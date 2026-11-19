@@ -4,6 +4,7 @@ import { OrbitControls, TransformControls, Grid, Html, Line } from '@react-three
 import * as THREE from 'three';
 import { useCircuitStore } from '../stores/circuitStore';
 import { AICircuitBuilder } from '../components/AICircuitBuilder';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import { solveCircuit } from '../simulation/engine';
 import { LAB_EXPERIMENTS } from '../experiments/lab3dExperiments';
 import { virtualScanner, nfcRecordToComponent } from '../nfc/scanner';
@@ -433,6 +434,7 @@ export function Lab3D() {
 
         {/* Center: 3D canvas */}
         <div className="w-full h-full flex-1 relative min-w-0 min-h-0">
+          <ErrorBoundary>
           <Canvas className="w-full h-full" camera={{ position: [6, 6, 6], fov: 45 }} shadows>
             <ambientLight intensity={0.6} />
             <directionalLight position={[5, 10, 5]} intensity={1} castShadow />
@@ -495,6 +497,7 @@ export function Lab3D() {
             )}
             <OrbitControls makeDefault />
           </Canvas>
+          </ErrorBoundary>
           {pendingTerminal && (
             <div className="absolute top-2 left-2 bg-yellow-500/20 text-yellow-200 text-xs px-2 py-1 rounded border border-yellow-500/40">
               Connecting from {pendingTerminal} — click another terminal
