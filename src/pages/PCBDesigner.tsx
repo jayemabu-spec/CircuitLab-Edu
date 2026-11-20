@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Stage, Layer, Rect, Text, Group, Line } from 'react-konva';
 import { useCircuitStore } from '../stores/circuitStore';
 import { usePCBStore, buildPCBFromCircuit } from '../stores/pcbStore';
@@ -117,8 +118,16 @@ export function PCBDesigner() {
 
   if (!pcb) {
     return (
-      <div className="p-6 text-[#94a3b8]">
-        No circuit loaded. Go to Dashboard and load an example circuit first, then open PCB Designer.
+      <div className="h-full flex items-center justify-center">
+        <div className="panel max-w-md text-center">
+          <h1 className="text-lg font-semibold text-white mb-2">No circuit loaded</h1>
+          <p className="text-sm text-charcoal-400 mb-4">
+            Load an example circuit from the Dashboard, then open the PCB Designer to place and route it.
+          </p>
+          <Link to="/" className="btn-primary">
+            Go to Dashboard
+          </Link>
+        </div>
       </div>
     );
   }

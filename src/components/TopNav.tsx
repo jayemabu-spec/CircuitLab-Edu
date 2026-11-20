@@ -16,19 +16,21 @@ const navItems = [
 
 export function TopNav() {
   return (
-    <nav className="flex items-center h-14 px-4 bg-charcoal-900 border-b border-charcoal-700 flex-shrink-0">
-      <span className="font-bold text-xl tracking-tight text-white mr-6">
+    <nav className="flex items-stretch h-14 px-4 bg-charcoal-900 border-b border-charcoal-700 flex-shrink-0">
+      <span className="flex items-center font-bold text-xl tracking-tight text-white mr-6 shrink-0">
         CircuitLab<span className="text-[#38bdf8]">Edu</span>
       </span>
-      <div className="flex items-center gap-1 overflow-x-auto">
+      <div className="flex items-stretch gap-1 h-full overflow-x-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              isActive
-                ? 'text-[#38bdf8] font-medium bg-[#38bdf8]/10 px-3 py-2 rounded-md text-sm'
-                : 'text-[#94a3b8] hover:text-white hover:bg-[#334155] px-3 py-2 rounded-md text-sm transition-colors'
+              `flex items-center px-3 text-sm border-b-2 transition-colors whitespace-nowrap ${
+                isActive
+                  ? 'border-[#38bdf8] text-white font-medium'
+                  : 'border-transparent text-[#94a3b8] hover:text-white'
+              }`
             }
           >
             {item.label}

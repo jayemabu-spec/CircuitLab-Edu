@@ -38,7 +38,7 @@ export function ComponentLibrary() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[#64748b]">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-400">
             <Plus size={14} />
           </div>
         </div>
@@ -50,7 +50,7 @@ export function ComponentLibrary() {
         ))}
         {filtered.length === 0 && (
           <div className="col-span-3 panel text-center py-12">
-            <p className="text-[#64748b]">No components found matching "{filter}".</p>
+            <p className="text-charcoal-400">No components found matching "{filter}".</p>
           </div>
         )}
       </div>
@@ -110,7 +110,7 @@ function ComponentCard({ comp }: { comp: typeof COMPONENTS[0] }) {
         {comp.defaultValue}{comp.unit}
       </p>
       <div className="mt-3 flex items-center justify-between">
-        <span className="text-[10px] text-[#64748b] uppercase">Click to add</span>
+        <span className="text-[10px] text-charcoal-400 uppercase">Click to add</span>
         <span className="text-xs font-medium text-[#cbd5e1]">{comp.id}</span>
       </div>
     </div>

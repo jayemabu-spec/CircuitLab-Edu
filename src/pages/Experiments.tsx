@@ -139,7 +139,7 @@ export function Experiments() {
             <ExperimentDetail experiment={EXPERIMENTS.find((e) => e.id === activeId)!} />
           ) : (
             <div className="panel flex flex-col items-center justify-center py-20 text-center">
-              <FlaskConical size={48} className="text-charcoal-600 mb-4" />
+              <FlaskConical size={48} className="text-charcoal-400 mb-4" />
               <h3 className="text-white font-semibold mb-2">Select an experiment</h3>
               <p className="text-[#94a3b8] text-sm">Choose an experiment from the list to begin.</p>
             </div>
@@ -253,7 +253,7 @@ function ExperimentDetail({ experiment }: { experiment: typeof EXPERIMENTS[0] })
             Build this circuit in the Circuit Designer and run the simulation to verify your calculations.
           </p>
           <button className="btn-secondary text-xs px-4 py-2">
-            <Play size={14} className="mr-2" /> Open Circuit Designer
+            <Play size={14} /> Open Circuit Designer
           </button>
         </div>
       </div>

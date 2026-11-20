@@ -71,7 +71,7 @@ export function NFCIdentification() {
           <p className="text-[#94a3b8] text-sm mt-1">
             Simulate NFC tag scanning to identify components automatically.
             <br />
-            <span className="text-xs text-[#64748b] mt-1 block">Virtual scanner - no physical hardware connected.</span>
+            <span className="text-xs text-charcoal-400 mt-1 block">Virtual scanner - no physical hardware connected.</span>
           </p>
         </div>
         <div className="flex gap-2">
@@ -129,10 +129,10 @@ export function NFCIdentification() {
                       setUidInput(uid);
                       handleScan();
                     }}
-                    className="w-full py-2 px-3 rounded-lg bg-[#0f172a] border border-[#475569] text-left text-sm text-[#cbd5e1] hover:text-white hover:border-[#64748b] transition-colors group"
+                    className="w-full flex items-center justify-between gap-3 py-2 px-3 rounded-lg bg-[#0f172a] border border-[#475569] text-left text-sm text-[#cbd5e1] hover:text-white hover:border-charcoal-400 transition-colors group"
                   >
                     <span className="font-mono text-xs text-[#38bdf8] group-hover:text-[#38bdf8]/80">{uid}</span>
-                    <span className="ml-auto text-xs text-[#64748b]">{label}</span>
+                    <span className="text-xs text-charcoal-400">{label}</span>
                   </button>
                 ))}
               </div>
@@ -174,7 +174,7 @@ export function NFCIdentification() {
                   </button>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center h-48 text-[#64748b]">
+                <div className="flex flex-col items-center justify-center h-48 text-charcoal-400">
                   <Search size={32} className="mb-3 opacity-50" />
                   <p className="text-xs">No component scanned</p>
                 </div>
@@ -191,7 +191,7 @@ export function NFCIdentification() {
           <span className="text-xs text-[#94a3b8]">{scanHistory.length} scans</span>
         </div>
         {scanHistory.length === 0 ? (
-          <div className="text-center py-8 text-[#64748b] text-sm">
+          <div className="text-center py-8 text-charcoal-400 text-sm">
             No scans yet. Use the virtual scanner to identify components.
           </div>
         ) : (

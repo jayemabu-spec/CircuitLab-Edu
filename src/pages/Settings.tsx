@@ -69,13 +69,11 @@ export function Settings() {
       <div className="panel">
         <h3 className="font-semibold text-white mb-4">Appearance</h3>
         <div className="flex items-center gap-3">
-          <div className="flex flex-col gap-2">
-            <label className="text-xs font-semibold text-[#94a3b8] uppercase">Theme</label>
-            <span className="text-sm text-[#cbd5e1]">Dark charcoal (engineering style)</span>
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-medium text-charcoal-400">Theme</span>
+            <span className="text-sm text-charcoal-300">Dark charcoal (engineering style)</span>
           </div>
-          <div className="w-14 h-7 rounded-full bg-[#475569] relative">
-            <div className="w-5 h-5 rounded-full bg-[#38bdf8] absolute top-1 left-1 shadow-md" />
-          </div>
+          <span className="badge">Dark only</span>
         </div>
       </div>
 
@@ -85,37 +83,37 @@ export function Settings() {
         <p className="text-sm text-[#94a3b8] mb-4">
           All data is stored locally in your browser using localStorage. No data is sent to any server.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-[#0f172a] p-4 rounded border border-[#334155]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white font-medium">Saved Circuits</span>
-              <span className="text-xs text-[#38bdf8] font-mono">{circuits.length}</span>
-            </div>
-            <p className="text-xs text-[#64748b]">Circuits saved to localStorage</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#334155] border border-[#334155] rounded-lg overflow-hidden mb-6">
+          <div className="bg-charcoal-800 p-4">
+            <div className="text-xs text-charcoal-400">Saved circuits</div>
+            <div className="mt-1 text-xl font-semibold text-white tabular-nums">{circuits.length}</div>
+            <p className="text-xs text-charcoal-400">In localStorage</p>
           </div>
-          <div className="bg-[#0f172a] p-4 rounded border border-[#334155]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white font-medium">NFC Scans</span>
-              <span className="text-xs text-[#38bdf8] font-mono">{nfcHistory.length}</span>
-            </div>
-            <p className="text-xs text-[#64748b]">Virtual NFC scan history</p>
+          <div className="bg-charcoal-800 p-4">
+            <div className="text-xs text-charcoal-400">NFC scans</div>
+            <div className="mt-1 text-xl font-semibold text-white tabular-nums">{nfcHistory.length}</div>
+            <p className="text-xs text-charcoal-400">Scan history</p>
           </div>
-          <div className="bg-[#0f172a] p-4 rounded border border-[#334155]">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-white font-medium">Inventory Items</span>
-              <span className="text-xs text-[#38bdf8] font-mono">{inventory.length}</span>
-            </div>
-            <p className="text-xs text-[#64748b]">Component inventory</p>
+          <div className="bg-charcoal-800 p-4">
+            <div className="text-xs text-charcoal-400">Inventory items</div>
+            <div className="mt-1 text-xl font-semibold text-white tabular-nums">{inventory.length}</div>
+            <p className="text-xs text-charcoal-400">Component inventory</p>
           </div>
         </div>
 
-        <div className="space-y-3">
-          <button onClick={handleExport} className="w-full btn-secondary flex items-center justify-center gap-2">
-            <Save size={16} /> Export All Data (JSON)
+        <div className="flex flex-wrap items-center gap-4">
+          <button onClick={handleExport} className="btn-secondary">
+            <Save size={16} /> Export JSON
           </button>
-          <div className="border-t border-[#334155] pt-3">
-            <label className="block text-xs font-semibold text-[#94a3b8] uppercase mb-2">Import Backup</label>
-            <input type="file" accept=".json" onChange={handleImport} className="w-full text-xs text-[#cbd5e1]" />
+          <div className="flex items-center gap-2">
+            <label htmlFor="import-backup" className="text-sm text-charcoal-300">Import backup</label>
+            <input
+              id="import-backup"
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="text-xs text-charcoal-300 file:mr-2 file:rounded-md file:border-0 file:bg-[#334155] file:px-3 file:py-1.5 file:text-xs file:text-white hover:file:bg-[#475569]"
+            />
           </div>
           <button
             onClick={() => {
@@ -127,9 +125,9 @@ export function Settings() {
                 alert('All data cleared.');
               }
             }}
-            className="w-full btn-secondary text-red-400 border-red-500/30 hover:bg-red-500/10 flex items-center justify-center gap-2"
+            className="sm:ml-auto inline-flex items-center gap-1.5 text-sm text-red-400 hover:text-red-300 px-2 py-1"
           >
-            <AlertTriangle size={16} /> Clear All Local Data
+            <AlertTriangle size={14} /> Clear all data
           </button>
         </div>
       </div>

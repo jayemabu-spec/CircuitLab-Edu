@@ -57,7 +57,7 @@ export function CircuitSimulator() {
       {circuit && circuit.components.length === 0 && (
         <div className="panel flex flex-col items-center justify-center py-20 text-center">
           <div className="w-16 h-16 rounded-full bg-[#1e293b] flex items-center justify-center mb-4 border border-[#475569]">
-            <Battery size={32} className="text-[#64748b]" />
+            <Battery size={32} className="text-charcoal-400" />
           </div>
           <h3 className="text-white font-semibold mb-2">No circuit designed yet</h3>
           <p className="text-[#94a3b8] text-sm mb-6">
@@ -260,7 +260,7 @@ function MetricCard({
         {icon}
       </div>
       <div className="text-xl font-bold text-white">{value}</div>
-      <span className="text-xs text-[#64748b]">{unit}</span>
+      <span className="text-xs text-charcoal-400">{unit}</span>
     </div>
   );
 }

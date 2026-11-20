@@ -541,7 +541,7 @@ export function CircuitDesigner() {
             ))}
           </div>
           <div className="mt-6 pt-4 border-t border-[#334155]">
-            <h3 className="text-xs font-semibold text-[#64748b] uppercase tracking-wider mb-2">Tips</h3>
+            <h3 className="text-xs font-semibold text-charcoal-400 uppercase tracking-wider mb-2">Tips</h3>
             <ul className="text-xs text-[#94a3b8] space-y-1">
               <li>• Drag components onto canvas</li>
               <li>• Click a terminal to start a wire</li>
@@ -570,11 +570,18 @@ export function CircuitDesigner() {
             onInit={() => {}}
           >
             <Controls />
-            <MiniMap />
+            {nodes.length > 0 && (
+              <MiniMap
+                style={{ background: '#1e293b' }}
+                maskColor="rgba(15,23,42,0.7)"
+                nodeColor="#475569"
+                nodeStrokeColor="#94a3b8"
+              />
+            )}
             <Background
               gap={16}
               size={1}
-              color="#1e293b"
+              color="#334155"
             />
           </ReactFlow>
         </div>
