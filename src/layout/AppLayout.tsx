@@ -1,20 +1,32 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { TopNav } from '../components/TopNav'
 
+const FULL_BLEED_ROUTES = ['/lab', '/designer', '/pcb', '/simulator', '/transient']
+
 function AppLayout() {
+  const { pathname } = useLocation()
+  const isFullBleed = FULL_BLEED_ROUTES.some((route) => pathname.startsWith(route))
+
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#0f172a] text-white">
+    <div className="h-screen w-screen overflow-hidden flex flex-col bg-[#141415] text-[#ededed]">
       <TopNav />
 
       <main className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
-        <div className="flex-1 min-w-0 flex flex-col relative overflow-auto px-6 py-6">
-          <Outlet />
-        </div>
+        {isFullBleed ? (
+          <div className="flex-1 min-w-0 flex flex-col relative overflow-hidden">
+            <Outlet />
+          </div>
+        ) : (
+          <div className="flex-1 min-w-0 flex flex-col relative overflow-auto">
+            <div className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
+              <Outlet />
+            </div>
+            <footer className="border-t border-white/[0.06] py-3 text-center text-xs text-[#85858b] shrink-0">
+              CircuitLab Edu · Interactive Electronics Laboratory
+            </footer>
+          </div>
+        )}
       </main>
-
-      <footer className="border-t border-[#334155] py-2 text-center text-xs text-[#94a3b8]">
-        CircuitLab Edu · Interactive Electronics Laboratory
-      </footer>
     </div>
   )
 }

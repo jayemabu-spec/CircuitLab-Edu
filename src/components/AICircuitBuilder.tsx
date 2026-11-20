@@ -189,91 +189,117 @@ export function AICircuitBuilder({ onClose }: AICircuitBuilderProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="panel w-full max-w-lg space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">AI Circuit Builder</h2>
-          <button onClick={onClose} className="text-[#94a3b8] hover:text-white text-xl leading-none" aria-label="Close">
-            ×
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs p-4">
+      <div className="w-full max-w-md bg-[#19191b] border border-white/[0.12] rounded-lg p-5 shadow-2xl space-y-4 text-[#ededed]">
+        <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
+          <div>
+            <h2 className="text-sm font-medium text-[#ededed]">AI Schematic Generator</h2>
+            <p className="text-[11px] text-[#85858b] mt-0.5">Describe your electronic circuit in plain natural language.</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-6 h-6 flex items-center justify-center rounded text-[#85858b] hover:text-[#ededed] hover:bg-white/[0.04] transition-colors"
+            aria-label="Close"
+          >
+            ✕
           </button>
         </div>
-        <div>
-          <label className="text-xs text-[#94a3b8]">Gemini API Key</label>
-          <div className="flex gap-2 mt-1">
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => handleApiKeyChange(e.target.value)}
-              placeholder="AIza..."
-              className="input-field flex-1"
-            />
-            <button
-              type="button"
-              onClick={() => fetchAvailableModels(apiKey)}
-              disabled={fetchingModels}
-              className="btn-secondary text-xs px-2 flex items-center gap-1"
-              title="Fetch available models"
-            >
-              {fetchingModels ? (
-                <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : null}
-              Refresh Models
-            </button>
-            <button type="button" onClick={handleClearKey} className="btn-secondary text-xs px-2" title="Remove saved key">
-              Clear
-            </button>
-          </div>
-          {availableModels.length > 0 && (
-            <div className="mt-2">
-              <label className="text-xs text-[#94a3b8]">Model</label>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="input-field mt-1"
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-medium text-[#a1a1a6]">Gemini API Key</label>
+            <div className="flex gap-1.5 mt-1">
+              <input
+                type="password"
+                value={apiKey}
+                onChange={(e) => handleApiKeyChange(e.target.value)}
+                placeholder="AIza..."
+                className="input-field flex-1 h-8"
+              />
+              <button
+                type="button"
+                onClick={() => fetchAvailableModels(apiKey)}
+                disabled={fetchingModels}
+                className="btn-secondary text-xs h-8 px-2.5 flex items-center gap-1"
+                title="Fetch available models"
               >
-                {availableModels.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
+                {fetchingModels ? (
+                  <span className="inline-block w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : null}
+                Refresh
+              </button>
+              <button
+                type="button"
+                onClick={handleClearKey}
+                className="btn-ghost text-xs h-8 px-2 text-[#85858b] hover:text-[#ededed]"
+                title="Remove saved key"
+              >
+                Clear
+              </button>
+            </div>
+            {availableModels.length > 0 && (
+              <div className="mt-2">
+                <label className="text-xs text-[#a1a1a6]">Engine Model</label>
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  className="input-field mt-1 h-8 font-mono text-xs"
+                >
+                  {availableModels.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <p className="text-[10px] text-[#85858b] mt-1.5">
+              Get an API key from{' '}
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[#38bdf8] hover:underline"
+              >
+                aistudio.google.com
+              </a>
+              . Stored locally in your browser.
+            </p>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#a1a1a6]">Circuit Description</label>
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="e.g. A 5V DC source connected in series with a 220Ω resistor, driving a red indicator LED to ground."
+              rows={3}
+              className="input-field mt-1 resize-none"
+            />
+          </div>
+          {error && (
+            <div className="text-xs text-[#e5484d] bg-[#e5484d]/10 border border-[#e5484d]/20 rounded p-2.5">
+              {error}
             </div>
           )}
-          <p className="text-[10px] text-[#94a3b8] mt-1">
-            Get a free key at{' '}
-            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-[#38bdf8] hover:underline">
-              aistudio.google.com/app/apikey
-            </a>
-            . Stored locally in your browser.
-          </p>
         </div>
-        <div>
-          <label className="text-xs text-[#94a3b8]">Circuit description</label>
-          <textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="A 5V battery connected to a 220 ohm resistor and an LED"
-            rows={4}
-            className="input-field mt-1 resize-none"
-          />
+        <div className="pt-2 flex justify-end gap-2 border-t border-white/[0.06]">
+          <button type="button" onClick={onClose} className="btn-secondary h-8 px-3 text-xs">
+            Cancel
+          </button>
+          <button
+            onClick={handleGenerate}
+            disabled={loading}
+            className="btn-primary h-8 px-4 text-xs flex items-center justify-center gap-1.5"
+          >
+            {loading ? (
+              <>
+                <span className="inline-block w-3 h-3 border-2 border-[#0f172a] border-t-transparent rounded-full animate-spin" />
+                <span>Synthesizing...</span>
+              </>
+            ) : (
+              <span>Build Schematic</span>
+            )}
+          </button>
         </div>
-        {error && (
-          <div className="text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded p-2">{error}</div>
-        )}
-        <button
-          onClick={handleGenerate}
-          disabled={loading}
-          className="btn-primary w-full flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <span className="inline-block w-4 h-4 border-2 border-[#0f172a] border-t-transparent rounded-full animate-spin" />
-              Generating…
-            </>
-          ) : (
-            'Generate Circuit'
-          )}
-        </button>
       </div>
     </div>
   );

@@ -9,25 +9,22 @@ import { solveCircuit } from '../simulation/engine';
 import { LAB_EXPERIMENTS } from '../experiments/lab3dExperiments';
 import { virtualScanner, nfcRecordToComponent } from '../nfc/scanner';
 import type { Component, Wire } from '../types/circuit';
-import { Play, Pause, RotateCcw, Search } from 'lucide-react';
+import { Play, Pause, RotateCcw, Search, Sparkles, Check, X, Trash2, Radio, Info } from 'lucide-react';
 
-const COMPONENT_LIBRARY: { type: string; label: string; defaults: Record<string, any>; color: string }[] = [
-  { type: 'resistor', label: 'Resistor 100Ω', defaults: { resistance: 100 }, color: '#38bdf8' },
-  { type: 'resistor', label: 'Resistor 220Ω', defaults: { resistance: 220 }, color: '#38bdf8' },
-  { type: 'resistor', label: 'Resistor 330Ω', defaults: { resistance: 330 }, color: '#38bdf8' },
-  { type: 'resistor', label: 'Resistor 470Ω', defaults: { resistance: 470 }, color: '#38bdf8' },
-  { type: 'resistor', label: 'Resistor 1kΩ', defaults: { resistance: 1000 }, color: '#38bdf8' },
-  { type: 'capacitor', label: 'Capacitor', defaults: { capacitance: 0.0001 }, color: '#22d3ee' },
-  { type: 'inductor', label: 'Inductor', defaults: { inductance: 0.01 }, color: '#38bdf8' },
-  { type: 'led', label: 'LED', defaults: { resistance: 20 }, color: '#f87171' },
-  { type: 'bulb', label: 'Light Bulb', defaults: { resistance: 47 }, color: '#fbbf24' },
-  { type: 'switch', label: 'Switch', defaults: { closed: false }, color: '#94a3b8' },
-  { type: 'voltageSource', label: 'DC Source', defaults: { voltage: 5 }, color: '#22d3ee' },
-  { type: 'ground', label: 'Ground', defaults: {}, color: '#64748b' },
-  { type: 'voltmeter', label: 'Voltmeter', defaults: {}, color: '#64748b' },
-  { type: 'ammeter', label: 'Ammeter', defaults: {}, color: '#64748b' },
-  { type: 'multimeter', label: 'Multimeter', defaults: {}, color: '#64748b' },
-  { type: 'breadboard', label: 'Breadboard', defaults: {}, color: '#a78bfa' },
+const COMPONENT_LIBRARY: { type: string; label: string; defaults: Record<string, any>; category: string }[] = [
+  { type: 'resistor', label: 'Resistor 100Ω', defaults: { resistance: 100 }, category: 'Passives' },
+  { type: 'resistor', label: 'Resistor 220Ω', defaults: { resistance: 220 }, category: 'Passives' },
+  { type: 'resistor', label: 'Resistor 330Ω', defaults: { resistance: 330 }, category: 'Passives' },
+  { type: 'resistor', label: 'Resistor 470Ω', defaults: { resistance: 470 }, category: 'Passives' },
+  { type: 'resistor', label: 'Resistor 1kΩ', defaults: { resistance: 1000 }, category: 'Passives' },
+  { type: 'capacitor', label: 'Capacitor 100µF', defaults: { capacitance: 0.0001 }, category: 'Passives' },
+  { type: 'inductor', label: 'Inductor 10mH', defaults: { inductance: 0.01 }, category: 'Passives' },
+  { type: 'led', label: 'LED (Red)', defaults: { resistance: 20 }, category: 'Semiconductors' },
+  { type: 'bulb', label: 'Incandescent Bulb', defaults: { resistance: 47 }, category: 'Loads' },
+  { type: 'switch', label: 'Toggle Switch', defaults: { closed: false }, category: 'Controls' },
+  { type: 'voltageSource', label: 'DC Supply 5V', defaults: { voltage: 5 }, category: 'Sources' },
+  { type: 'ground', label: 'Earth Ground', defaults: {}, category: 'Sources' },
+  { type: 'breadboard', label: 'Breadboard Surface', defaults: {}, category: 'Mounts' },
 ];
 
 function offsetsFor(comp: Component): [number, number, number][] {
@@ -57,7 +54,6 @@ function terminalOwner(components: Component[], tid: string): { comp: Component;
   return null;
 }
 
-// Geometry
 function ComponentGeometry({ comp, power }: { comp: Component; power: number }) {
   const emissiveIntensity = comp.type === 'led' || comp.type === 'bulb' ? Math.min(3, power * 0.5) : 0;
   const color =
@@ -67,16 +63,17 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
     comp.type === 'led' ? '#f87171' :
     comp.type === 'bulb' ? '#fbbf24' :
     comp.type === 'switch' ? '#94a3b8' :
-    comp.type === 'voltageSource' ? '#22d3ee' :
+    comp.type === 'voltageSource' ? '#38bdf8' :
     comp.type === 'ground' ? '#64748b' :
-    comp.type === 'breadboard' ? '#a78bfa' :
+    comp.type === 'breadboard' ? '#334155' :
     '#64748b';
+
   switch (comp.type) {
     case 'resistor':
       return (
         <mesh rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.12, 0.12, 1.2, 16]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={color} roughness={0.4} />
         </mesh>
       );
     case 'capacitor':
@@ -84,11 +81,11 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
         <group>
           <mesh position={[-0.15, 0, 0]}>
             <cylinderGeometry args={[0.2, 0.2, 0.15, 16]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={color} roughness={0.3} metalness={0.2} />
           </mesh>
           <mesh position={[0.15, 0, 0]}>
             <cylinderGeometry args={[0.2, 0.2, 0.15, 16]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={color} roughness={0.3} metalness={0.2} />
           </mesh>
         </group>
       );
@@ -96,7 +93,7 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
       return (
         <mesh>
           <torusGeometry args={[0.35, 0.08, 8, 24]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={color} roughness={0.3} metalness={0.5} />
         </mesh>
       );
     case 'led':
@@ -105,11 +102,11 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
         <group>
           <mesh position={[0, 0.25, 0]}>
             <sphereGeometry args={[0.22, 16, 16]} />
-            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={emissiveIntensity} />
+            <meshStandardMaterial color={color} emissive={color} emissiveIntensity={emissiveIntensity} roughness={0.2} />
           </mesh>
           <mesh position={[0, -0.15, 0]}>
             <cylinderGeometry args={[0.05, 0.05, 0.3, 8]} />
-            <meshStandardMaterial color="#94a3b8" />
+            <meshStandardMaterial color="#85858b" metalness={0.6} />
           </mesh>
         </group>
       );
@@ -118,11 +115,11 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
         <group>
           <mesh>
             <boxGeometry args={[0.3, 0.15, 0.3]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={color} roughness={0.5} />
           </mesh>
           <mesh position={[0.2, 0.2, 0]} rotation={[0, 0, comp.properties.closed ? 0 : Math.PI / 6]}>
             <boxGeometry args={[0.6, 0.05, 0.05]} />
-            <meshStandardMaterial color="#cbd5e1" />
+            <meshStandardMaterial color="#ededed" metalness={0.8} />
           </mesh>
         </group>
       );
@@ -130,7 +127,7 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
       return (
         <mesh>
           <cylinderGeometry args={[0.35, 0.35, 0.6, 24]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color={color} metalness={0.4} roughness={0.3} />
         </mesh>
       );
     case 'ground':
@@ -138,11 +135,11 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
         <group>
           <mesh position={[0, -0.1, 0]}>
             <boxGeometry args={[0.6, 0.05, 0.6]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={color} metalness={0.5} />
           </mesh>
           <mesh position={[0, 0.1, 0]}>
             <boxGeometry args={[0.3, 0.05, 0.3]} />
-            <meshStandardMaterial color={color} />
+            <meshStandardMaterial color={color} metalness={0.5} />
           </mesh>
         </group>
       );
@@ -150,7 +147,7 @@ function ComponentGeometry({ comp, power }: { comp: Component; power: number }) 
       return (
         <mesh>
           <boxGeometry args={[2.4, 0.12, 1.2]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial color="#232325" roughness={0.7} />
         </mesh>
       );
     default:
@@ -200,8 +197,8 @@ function Particle({ start, end, t0, speed }: { start: THREE.Vector3; end: THREE.
   });
   return (
     <mesh ref={ref}>
-      <sphereGeometry args={[0.06, 8, 8]} />
-      <meshBasicMaterial color="#fbbf24" />
+      <sphereGeometry args={[0.05, 8, 8]} />
+      <meshBasicMaterial color="#38bdf8" />
     </mesh>
   );
 }
@@ -279,7 +276,6 @@ export function Lab3D() {
             { id: `${id}-b`, componentId: id, position: 'right', nodeId: null },
           ],
     };
-    // set label nicer
     const lib = COMPONENT_LIBRARY.find((l) => l.type === type && JSON.stringify(l.defaults) === JSON.stringify(defaults));
     if (lib) comp.label = lib.label;
     addComponent(comp);
@@ -336,7 +332,7 @@ export function Lab3D() {
       addComponent(comp);
       setNfcHistory((h) => [record, ...h]);
     } else {
-      setNfcHistory((h) => [{ uid: nfcUid, success: false, label: 'Unknown', timestamp: Date.now() }, ...h]);
+      setNfcHistory((h) => [{ uid: nfcUid, success: false, label: 'Unknown Tag', timestamp: Date.now() }, ...h]);
     }
   }, [nfcUid, addComponent]);
 
@@ -348,7 +344,6 @@ export function Lab3D() {
 
   const speed = simResults?.valid ? Math.min(3, 0.5 + (simResults.totalCurrent || 0) * 2) : 0.5;
 
-  // TransformControls object ref
   useEffect(() => {
     if (selectedId) {
       selectedGroupRef.current = groupRefs.current[selectedId] ?? null;
@@ -358,236 +353,402 @@ export function Lab3D() {
   }, [selectedId, components.length]);
 
   return (
-    <div className="w-full h-full flex-1 flex flex-col relative min-w-0 overflow-hidden">
-      {/* Top bar */}
-      <div className="h-12 border-b border-[#334155] bg-[#1e293b] flex items-center justify-between px-4">
-        <h2 className="text-lg font-bold text-white">3D Electronics Laboratory</h2>
+    <div className="w-full h-full flex-1 flex flex-col relative min-w-0 overflow-hidden bg-[#141415] text-[#ededed]">
+      {/* Workbench Toolbar */}
+      <div className="h-11 border-b border-white/[0.08] bg-[#0f0f10] flex items-center justify-between px-4 shrink-0 select-none">
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-medium text-[#ededed]">3D Virtual Workbench</span>
+          <span className="text-[11px] font-mono text-[#85858b] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
+            {components.length} parts · {wires.length} wires
+          </span>
+        </div>
+
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowAI(true)} className="btn-secondary flex items-center gap-2 text-sm">
-            AI Build
+          <button
+            onClick={() => setShowAI(true)}
+            className="btn-secondary text-xs flex items-center gap-1.5 h-7 px-2.5"
+          >
+            <Sparkles size={13} className="text-[#38bdf8]" />
+            <span>AI Assistant</span>
           </button>
-          <button onClick={runSimulation} className="btn-primary flex items-center gap-2 text-sm">
-            {isSimulating ? <Pause size={14} /> : <Play size={14} />} {isSimulating ? 'Running' : 'Run'}
-          </button>
-          <button onClick={() => { setIsSimulating(false); setSimulation(false); }} className="btn-secondary text-sm">
-            Pause
-          </button>
-          <button onClick={handleResetBoard} className="text-red-400 hover:text-red-300 text-sm flex items-center gap-1">
-            <RotateCcw size={14} /> Reset Board
+
+          {isSimulating ? (
+            <button
+              onClick={() => { setIsSimulating(false); setSimulation(false); }}
+              className="btn-secondary text-xs flex items-center gap-1.5 h-7 px-2.5"
+            >
+              <Pause size={13} />
+              <span>Pause</span>
+            </button>
+          ) : (
+            <button
+              onClick={runSimulation}
+              className="btn-signal text-xs flex items-center gap-1.5 h-7 px-3"
+            >
+              <Play size={13} fill="currentColor" />
+              <span>Run Solver</span>
+            </button>
+          )}
+
+          <div className="h-4 w-px bg-white/[0.08] mx-1" />
+
+          <button
+            onClick={handleResetBoard}
+            className="btn-ghost text-xs text-[#85858b] hover:text-[#e5484d] flex items-center gap-1 h-7 px-2"
+            title="Reset Board"
+          >
+            <RotateCcw size={13} />
+            <span>Clear</span>
           </button>
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left: library + experiments */}
-        <aside className="w-72 bg-[#1e293b] border-r border-[#334155] p-3 overflow-y-auto">
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search components..."
-            className="w-full mb-3 px-3 py-2 rounded bg-[#0f172a] border border-[#475569] text-sm text-white"
-          />
-          <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">Components (drag to board)</h3>
-          <div className="space-y-1 mb-4">
-            {filteredLib.map((l, i) => (
-              <div
-                key={i}
-                draggable
-                onDragStart={(e) => e.dataTransfer.setData('componentType', l.type)}
-                onClick={() => handleAddComponent(l.type, l.defaults)}
-                className="flex items-center gap-2 px-2 py-1.5 rounded bg-[#0f172a] border border-[#475569] text-sm text-white hover:border-[#64748b] cursor-grab"
-              >
-                <span className="w-3 h-3 rounded" style={{ background: l.color }} />
-                {l.label}
-              </div>
-            ))}
-          </div>
-          <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">Experiments</h3>
-          <div className="space-y-1 mb-4">
-            {LAB_EXPERIMENTS.map((exp) => (
-              <button
-                key={exp.id}
-                onClick={() => handleLoadExperiment(exp)}
-                className="w-full text-left px-2 py-1.5 rounded bg-[#0f172a] border border-[#475569] text-xs text-white hover:border-[#64748b]"
-              >
-                {exp.title}
-              </button>
-            ))}
-          </div>
-          <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">NFC (simulated)</h3>
-          <div className="space-y-2">
-            <select value={nfcUid} onChange={(e) => setNfcUid(e.target.value)} className="w-full px-2 py-1 rounded bg-[#0f172a] border border-[#475569] text-xs text-white">
-              {Object.keys((virtualScanner as any).getDatabase()).map((uid) => (
-                <option key={uid} value={uid}>{uid}</option>
-              ))}
-            </select>
-            <button onClick={handleNFCScan} className="w-full btn-secondary text-xs flex items-center justify-center gap-1">
-              <Search size={12} /> Simulate NFC Scan
-            </button>
-            <div className="text-[10px] text-[#94a3b8] max-h-24 overflow-y-auto">
-              {nfcHistory.map((h: any, i) => (
-                <div key={i}>{h.success ? `✔ ${h.label}` : `✘ ${h.uid}`}</div>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        {/* Center: 3D canvas */}
-        <div className="w-full h-full flex-1 relative min-w-0 min-h-0">
-          <ErrorBoundary>
-          <Canvas className="w-full h-full" camera={{ position: [6, 6, 6], fov: 45 }} shadows>
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[5, 10, 5]} intensity={1} castShadow />
-            <Grid args={[20, 20]} cellSize={1} cellColor="#1e293b" sectionColor="#334155" fadeDistance={30} />
-            <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-              <planeGeometry args={[20, 20]} />
-              <meshStandardMaterial color="#0f172a" />
-            </mesh>
-            <DragDropController onDrop={handleDrop} />
-            {components.map((comp) => {
-              const power = simResults?.componentPowers?.[comp.id] ?? 0;
-              const isSelected = selectedId === comp.id;
-              return (
-                <group
-                  key={comp.id}
-                  ref={(el) => { if (el) groupRefs.current[comp.id] = el; }}
-                  position={[comp.position.x, 0, comp.position.y]}
-                  rotation={[0, (comp.rotation || 0) * Math.PI / 180, 0]}
-                  onClick={(e) => { e.stopPropagation(); setSelectedComponent(comp.id); }}
-                >
-                  <ComponentGeometry comp={comp} power={power} />
-                  {/* terminals */}
-                  {offsetsFor(comp).map((off, idx) => {
-                    const tid = terminalId(comp, idx);
-                    const isPending = pendingTerminal === tid;
-                    return (
-                      <mesh
-                        key={tid}
-                        position={off}
-                        onClick={(e) => { e.stopPropagation(); handleTerminalClick(comp.id, tid); }}
-                      >
-                        <sphereGeometry args={[0.09, 12, 12]} />
-                        <meshStandardMaterial color={isPending ? '#fbbf24' : isSelected ? '#38bdf8' : '#f8fafc'} emissive={isPending ? '#fbbf24' : '#000000'} />
-                      </mesh>
-                    );
-                  })}
-                  <Html position={[0, 0.6, 0]} center>
-                    <div className="text-[10px] text-white bg-black/50 px-1 rounded pointer-events-none">{comp.label}</div>
-                  </Html>
-                </group>
-              );
-            })}
-            {wires.map((wire) => (
-              <WireLine key={wire.id} wire={wire} components={components} />
-            ))}
-            {isSimulating && wires.map((wire) => (
-              <WireParticles key={`p-${wire.id}`} wire={wire} components={components} speed={speed} simulating={isSimulating} />
-            ))}
-            {selectedId && groupRefs.current[selectedId] && (
-              <TransformControls
-                object={groupRefs.current[selectedId]!}
-                mode="translate"
-                translationSnap={0.5}
-                onMouseUp={() => {
-                  const g = groupRefs.current[selectedId!];
-                  if (!g || !selectedId) return;
-                  updateComponent(selectedId, { position: { x: g.position.x, y: g.position.z }, rotation: Math.round((g.rotation.y * 180) / Math.PI) });
-                }}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Left Dock: Parts & Presets */}
+        <aside className="w-[280px] bg-[#0f0f10] border-r border-white/[0.08] flex flex-col shrink-0 overflow-hidden select-none">
+          <div className="p-3 border-b border-white/[0.08]">
+            <div className="relative">
+              <Search size={13} className="absolute left-2.5 top-2.5 text-[#85858b]" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search components..."
+                className="w-full h-8 pl-8 pr-2.5 rounded bg-[#141415] border border-white/[0.08] text-xs text-[#ededed] placeholder-[#85858b] focus:border-white/[0.2] outline-none transition-colors"
               />
-            )}
-            <OrbitControls makeDefault />
-          </Canvas>
-          </ErrorBoundary>
-          {pendingTerminal && (
-            <div className="absolute top-2 left-2 bg-yellow-500/20 text-yellow-200 text-xs px-2 py-1 rounded border border-yellow-500/40">
-              Connecting from {pendingTerminal} — click another terminal
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Right: properties + results */}
-        <aside className="w-72 flex-shrink-0 bg-[#1e293b] border-l border-[#334155] p-3 overflow-y-auto">
-          <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">Selected Component</h3>
-          {selectedComp ? (
-            <div className="space-y-2 mb-4">
-              <div className="text-sm text-white font-bold">{selectedComp.label}</div>
-              <div className="text-xs text-[#94a3b8]">Type: {selectedComp.type} | Terminals: {offsetsFor(selectedComp).length}</div>
-              {Object.entries(selectedComp.properties).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between gap-2">
-                  <span className="text-xs text-[#94a3b8]">{key}</span>
-                  {typeof value === 'boolean' ? (
-                    <input
-                      type="checkbox"
-                      checked={value}
-                      onChange={(e) => updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [key]: e.target.checked } })}
-                    />
-                  ) : (
-                    <input
-                      type="number"
-                      value={value as number}
-                      onChange={(e) => {
-                        const num = parseFloat(e.target.value);
-                        updateComponent(selectedComp.id, { properties: { ...selectedComp.properties, [key]: isNaN(num) ? value : num } });
-                      }}
-                      className="w-24 px-2 py-1 rounded bg-[#0f172a] border border-[#475569] text-xs text-white"
-                    />
-                  )}
-                </div>
-              ))}
-              <button onClick={() => removeComponent(selectedComp.id)} className="text-xs text-red-400 hover:text-red-300">Delete component</button>
-            </div>
-          ) : (
-            <div className="text-xs text-[#94a3b8] mb-4">Click a component to edit properties.</div>
-          )}
-
-          <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">Simulation Results</h3>
-          {simResults ? (
-            <div className="space-y-2 text-xs">
-              <div className={`px-2 py-1 rounded ${simResults.valid ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
-                {simResults.valid ? 'Valid Circuit' : 'Invalid Circuit'}
+          <div className="flex-1 overflow-y-auto p-3 space-y-5">
+            {/* Component Palette */}
+            <section>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[11px] font-medium text-[#85858b]">Component Palette</h3>
+                <span className="text-[10px] text-[#85858b] font-mono">drag & drop</span>
               </div>
-              {!simResults.valid && (
-                <ul className="text-red-200 list-disc list-inside">
-                  {simResults.errors.map((e: string, i: number) => <li key={i}>{e}</li>)}
-                </ul>
-              )}
-              {simResults.valid && (
-                <>
-                  <div className="bg-[#0f172a] p-2 rounded">
-                    <div className="text-[#94a3b8]">Total Resistance</div>
-                    <div className="text-[#38bdf8] font-bold">{simResults.totalResistance.toFixed(2)} Ω</div>
+              <div className="space-y-1">
+                {filteredLib.map((item, idx) => (
+                  <div
+                    key={idx}
+                    draggable
+                    onDragStart={(e) => e.dataTransfer.setData('componentType', item.type)}
+                    onClick={() => handleAddComponent(item.type, item.defaults)}
+                    className="flex items-center justify-between h-8 px-2.5 rounded bg-[#141415] border border-white/[0.06] hover:bg-[#19191b] hover:border-white/[0.12] active:scale-[0.99] transition-all cursor-grab"
+                  >
+                    <span className="text-xs text-[#ededed]">{item.label}</span>
+                    <span className="text-[10px] font-mono text-[#85858b]">{item.category}</span>
                   </div>
-                  <div className="bg-[#0f172a] p-2 rounded">
-                    <div className="text-[#94a3b8]">Total Current</div>
-                    <div className="text-[#38bdf8] font-bold">{simResults.totalCurrent.toFixed(4)} A</div>
-                  </div>
-                  <div className="bg-[#0f172a] p-2 rounded">
-                    <div className="text-[#94a3b8]">Total Voltage</div>
-                    <div className="text-[#38bdf8] font-bold">{(simResults.totalCurrent * simResults.totalResistance).toFixed(3)} V</div>
-                  </div>
-                  <div className="mt-2">
-                    <div className="text-[#94a3b8] font-bold mb-1">Component values</div>
-                    {components.map((c) => (
-                      <div key={c.id} className="flex justify-between">
-                        <span className="text-[#94a3b8] truncate">{c.label}</span>
-                        <span className="text-white">{(simResults.componentVoltages?.[c.id] ?? 0).toFixed(3)}V {(simResults.componentPowers?.[c.id] ?? 0).toFixed(3)}W</span>
+                ))}
+              </div>
+            </section>
+
+            {/* Guided Experiments */}
+            <section>
+              <h3 className="text-[11px] font-medium text-[#85858b] mb-2">Preset Circuits</h3>
+              <div className="space-y-1">
+                {LAB_EXPERIMENTS.slice(0, 5).map((exp) => (
+                  <button
+                    key={exp.id}
+                    onClick={() => handleLoadExperiment(exp)}
+                    className="w-full text-left px-2.5 py-1.5 rounded bg-[#141415] border border-white/[0.06] hover:bg-[#19191b] hover:border-white/[0.12] transition-colors"
+                  >
+                    <div className="text-xs text-[#ededed] font-medium leading-tight">{exp.title}</div>
+                    <div className="text-[10px] text-[#85858b] truncate mt-0.5">{exp.objective}</div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Simulated NFC Interface */}
+            <section>
+              <div className="flex items-center gap-1.5 mb-2">
+                <Radio size={13} className="text-[#85858b]" />
+                <h3 className="text-[11px] font-medium text-[#85858b]">NFC Hardware Link</h3>
+              </div>
+              <div className="space-y-2 bg-[#141415] p-2.5 rounded border border-white/[0.06]">
+                <select
+                  value={nfcUid}
+                  onChange={(e) => setNfcUid(e.target.value)}
+                  className="w-full h-7 px-2 rounded bg-[#0f0f10] border border-white/[0.08] text-xs font-mono text-[#ededed] outline-none"
+                >
+                  {Object.keys((virtualScanner as any).getDatabase()).map((uid) => (
+                    <option key={uid} value={uid}>{uid}</option>
+                  ))}
+                </select>
+
+                <button
+                  onClick={handleNFCScan}
+                  className="w-full btn-secondary text-xs h-7 flex items-center justify-center gap-1.5"
+                >
+                  <span>Read Tag to Board</span>
+                </button>
+
+                {nfcHistory.length > 0 && (
+                  <div className="pt-2 border-t border-white/[0.06] space-y-1 max-h-20 overflow-y-auto">
+                    {nfcHistory.map((h: any, i) => (
+                      <div key={i} className="flex items-center gap-1.5 text-[11px] font-mono text-[#85858b]">
+                        {h.success ? (
+                          <Check size={11} className="text-[#4cc38a] shrink-0" />
+                        ) : (
+                          <X size={11} className="text-[#e5484d] shrink-0" />
+                        )}
+                        <span className="truncate">{h.label || h.uid}</span>
                       </div>
                     ))}
                   </div>
-                </>
+                )}
+              </div>
+            </section>
+          </div>
+        </aside>
+
+        {/* Center: 3D Interactive Workbench */}
+        <div className="flex-1 relative min-w-0 min-h-0 bg-[#0f0f10]">
+          <ErrorBoundary>
+            <Canvas className="w-full h-full" camera={{ position: [6, 6, 6], fov: 45 }} shadows>
+              <ambientLight intensity={0.5} />
+              <directionalLight position={[6, 12, 6]} intensity={1.2} castShadow />
+              <Grid args={[20, 20]} cellSize={1} cellColor="#19191b" sectionColor="#232325" fadeDistance={30} />
+              <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
+                <planeGeometry args={[20, 20]} />
+                <meshStandardMaterial color="#0f0f10" roughness={0.9} />
+              </mesh>
+
+              <DragDropController onDrop={handleDrop} />
+
+              {components.map((comp) => {
+                const power = simResults?.componentPowers?.[comp.id] ?? 0;
+                const isSelected = selectedId === comp.id;
+                return (
+                  <group
+                    key={comp.id}
+                    ref={(el) => { if (el) groupRefs.current[comp.id] = el; }}
+                    position={[comp.position.x, 0, comp.position.y]}
+                    rotation={[0, (comp.rotation || 0) * Math.PI / 180, 0]}
+                    onClick={(e) => { e.stopPropagation(); setSelectedComponent(comp.id); }}
+                  >
+                    <ComponentGeometry comp={comp} power={power} />
+                    {offsetsFor(comp).map((off, idx) => {
+                      const tid = terminalId(comp, idx);
+                      const isPending = pendingTerminal === tid;
+                      return (
+                        <mesh
+                          key={tid}
+                          position={off}
+                          onClick={(e) => { e.stopPropagation(); handleTerminalClick(comp.id, tid); }}
+                        >
+                          <sphereGeometry args={[0.08, 12, 12]} />
+                          <meshStandardMaterial
+                            color={isPending ? '#f59e0b' : isSelected ? '#38bdf8' : '#85858b'}
+                            emissive={isPending ? '#f59e0b' : isSelected ? '#38bdf8' : '#000000'}
+                            emissiveIntensity={isPending ? 0.6 : 0.2}
+                          />
+                        </mesh>
+                      );
+                    })}
+                    <Html position={[0, 0.55, 0]} center>
+                      <div className="font-mono text-[10px] text-[#ededed] bg-[#0f0f10]/80 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/[0.08] pointer-events-none select-none">
+                        {comp.label}
+                      </div>
+                    </Html>
+                  </group>
+                );
+              })}
+
+              {wires.map((wire) => (
+                <WireLine key={wire.id} wire={wire} components={components} />
+              ))}
+
+              {isSimulating && wires.map((wire) => (
+                <WireParticles key={`p-${wire.id}`} wire={wire} components={components} speed={speed} simulating={isSimulating} />
+              ))}
+
+              {selectedId && groupRefs.current[selectedId] && (
+                <TransformControls
+                  object={groupRefs.current[selectedId]!}
+                  mode="translate"
+                  translationSnap={0.5}
+                  onMouseUp={() => {
+                    const g = groupRefs.current[selectedId!];
+                    if (!g || !selectedId) return;
+                    updateComponent(selectedId, {
+                      position: { x: g.position.x, y: g.position.z },
+                      rotation: Math.round((g.rotation.y * 180) / Math.PI)
+                    });
+                  }}
+                />
+              )}
+              <OrbitControls makeDefault />
+            </Canvas>
+          </ErrorBoundary>
+
+          {/* Pending Wire Indicator */}
+          {pendingTerminal && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#19191b]/90 backdrop-blur-md border border-white/[0.12] shadow-lg text-xs font-mono text-[#ededed] select-none">
+              <span className="w-2 h-2 rounded-full bg-[#f59e0b] animate-pulse" />
+              <span>Lead active from {pendingTerminal} — select destination pin</span>
+              <button
+                onClick={() => setPendingTerminal(null)}
+                className="ml-1 text-[#85858b] hover:text-[#ededed]"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Right Dock: Inspector & Telemetry */}
+        <aside className="w-[280px] bg-[#0f0f10] border-l border-white/[0.08] flex flex-col shrink-0 overflow-y-auto select-none">
+          {/* Selected Component Section */}
+          <div className="p-3 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[11px] font-medium text-[#85858b]">Component Inspector</h3>
+              {selectedComp && (
+                <button
+                  onClick={() => removeComponent(selectedComp.id)}
+                  className="text-[#85858b] hover:text-[#e5484d] transition-colors p-1"
+                  title="Remove Component"
+                >
+                  <Trash2 size={13} />
+                </button>
               )}
             </div>
-          ) : (
-            <div className="text-xs text-[#94a3b8]">Run simulation to see results.</div>
-          )}
 
-          <div className="mt-4">
-            <h3 className="text-xs font-semibold text-[#94a3b8] uppercase mb-2">Wires</h3>
-            <div className="text-xs text-[#94a3b8]">{wires.length} connections</div>
-            <button onClick={() => { if (wires.length) removeWire(wires[wires.length-1].id); }} className="text-xs text-red-400 hover:text-red-300 mt-1">Remove last wire</button>
+            {selectedComp ? (
+              <div className="space-y-2.5">
+                <div className="bg-[#141415] p-2.5 rounded border border-white/[0.06]">
+                  <div className="text-xs font-medium text-[#ededed]">{selectedComp.label}</div>
+                  <div className="text-[10px] font-mono text-[#85858b] mt-0.5">
+                    Type: {selectedComp.type} · Terminals: {offsetsFor(selectedComp).length}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {Object.entries(selectedComp.properties).map(([key, value]) => (
+                    <div key={key} className="flex items-center justify-between gap-2">
+                      <span className="text-xs text-[#a1a1a6] capitalize">{key}</span>
+                      {typeof value === 'boolean' ? (
+                        <input
+                          type="checkbox"
+                          checked={value}
+                          onChange={(e) => updateComponent(selectedComp.id, {
+                            properties: { ...selectedComp.properties, [key]: e.target.checked }
+                          })}
+                          className="rounded border border-white/[0.1] bg-[#141415] text-[#38bdf8] focus:ring-0"
+                        />
+                      ) : (
+                        <input
+                          type="number"
+                          value={value as number}
+                          onChange={(e) => {
+                            const num = parseFloat(e.target.value);
+                            updateComponent(selectedComp.id, {
+                              properties: { ...selectedComp.properties, [key]: isNaN(num) ? value : num }
+                            });
+                          }}
+                          className="w-24 h-7 px-2 rounded bg-[#141415] border border-white/[0.08] text-xs font-mono text-[#ededed] text-right outline-none focus:border-white/[0.2]"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 p-2.5 rounded bg-[#141415] border border-white/[0.04] text-xs text-[#85858b]">
+                <Info size={13} className="shrink-0" />
+                <span>Select a part to adjust parameters</span>
+              </div>
+            )}
+          </div>
+
+          {/* Telemetry Readout Section */}
+          <div className="p-3 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[11px] font-medium text-[#85858b]">Telemetry Solver</h3>
+              {simResults && (
+                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                  simResults.valid ? 'text-[#4cc38a] bg-[#4cc38a]/10' : 'text-[#e5484d] bg-[#e5484d]/10'
+                }`}>
+                  {simResults.valid ? 'Solved' : 'Open / Error'}
+                </span>
+              )}
+            </div>
+
+            {simResults?.valid ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-1.5 font-mono">
+                  <div className="bg-[#141415] p-2 rounded border border-white/[0.06]">
+                    <div className="text-[10px] text-[#85858b]">Voltage Drop</div>
+                    <div className="text-sm font-semibold text-[#ededed] tabular-nums mt-0.5">
+                      {(simResults.totalCurrent * simResults.totalResistance).toFixed(2)} V
+                    </div>
+                  </div>
+                  <div className="bg-[#141415] p-2 rounded border border-white/[0.06]">
+                    <div className="text-[10px] text-[#85858b]">Loop Current</div>
+                    <div className="text-sm font-semibold text-[#38bdf8] tabular-nums mt-0.5">
+                      {(simResults.totalCurrent * 1000).toFixed(1)} mA
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#141415] p-2 rounded border border-white/[0.06] font-mono">
+                  <div className="text-[10px] text-[#85858b]">Equivalent Resistance</div>
+                  <div className="text-sm font-semibold text-[#ededed] tabular-nums mt-0.5">
+                    {simResults.totalResistance.toFixed(1)} Ω
+                  </div>
+                </div>
+
+                {components.length > 0 && (
+                  <div className="pt-2 border-t border-white/[0.06] space-y-1">
+                    <div className="text-[10px] text-[#85858b] font-medium mb-1">Per-component Load</div>
+                    {components.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-[11px] font-mono">
+                        <span className="text-[#85858b] truncate max-w-[120px]">{c.label}</span>
+                        <span className="text-[#ededed] tabular-nums">
+                          {(simResults.componentVoltages?.[c.id] ?? 0).toFixed(2)}V
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : simResults && !simResults.valid ? (
+              <div className="p-2.5 rounded bg-[#e5484d]/10 border border-[#e5484d]/20 text-xs text-[#e5484d]">
+                <div className="font-medium mb-1">Circuit Incomplete</div>
+                <div className="text-[11px] text-[#e5484d]/80">
+                  Ensure closed loop from source through load to ground.
+                </div>
+              </div>
+            ) : (
+              <div className="p-2.5 rounded bg-[#141415] border border-white/[0.04] text-xs text-[#85858b]">
+                Click <span className="text-[#ededed]">Run Solver</span> to calculate node voltages and currents.
+              </div>
+            )}
+          </div>
+
+          {/* Connections / Leads List */}
+          <div className="p-3">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-[11px] font-medium text-[#85858b]">Circuit Leads</h3>
+              <span className="text-[10px] font-mono text-[#85858b]">{wires.length} wired</span>
+            </div>
+
+            {wires.length > 0 ? (
+              <div className="space-y-1">
+                <button
+                  onClick={() => removeWire(wires[wires.length - 1].id)}
+                  className="w-full btn-ghost text-xs text-[#85858b] hover:text-[#e5484d] h-7 justify-start px-2 border border-white/[0.06]"
+                >
+                  <Trash2 size={12} />
+                  <span>Undo Last Lead ({wires[wires.length - 1].id.slice(-4)})</span>
+                </button>
+              </div>
+            ) : (
+              <div className="text-[11px] text-[#85858b]">No active wires connected.</div>
+            )}
           </div>
         </aside>
       </div>
+
       {showAI && <AICircuitBuilder onClose={() => setShowAI(false)} />}
     </div>
   );
