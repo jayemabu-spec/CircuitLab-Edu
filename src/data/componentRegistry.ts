@@ -1,0 +1,187 @@
+export interface ComponentDefinition {
+  type: string; // e.g., 'diode', 'npn_transistor', 'inductor'
+  label: string;
+  category: 'passive' | 'semiconductor' | 'active' | 'electromechanical';
+  terminals: string[]; // e.g., ['anode', 'cathode']
+  defaultProperties: Record<string, number | string>;
+  model3D: 'box' | 'cylinder' | 'custom'; // Tells React Three Fiber how to render it
+  color: string;
+  pinCount: number;
+}
+
+export const COMPONENT_REGISTRY: Record<string, ComponentDefinition> = {
+  // Existing components
+  resistor: {
+    type: 'resistor',
+    label: 'Resistor',
+    category: 'passive',
+    terminals: ['a', 'b'],
+    defaultProperties: { resistance: 100 },
+    model3D: 'cylinder',
+    color: '#38bdf8',
+    pinCount: 2,
+  },
+  bulb: {
+    type: 'bulb',
+    label: 'Light Bulb',
+    category: 'passive',
+    terminals: ['a', 'b'],
+    defaultProperties: { resistance: 47 },
+    model3D: 'custom',
+    color: '#fbbf24',
+    pinCount: 2,
+  },
+  led: {
+    type: 'led',
+    label: 'LED',
+    category: 'semiconductor',
+    terminals: ['anode', 'cathode'],
+    defaultProperties: { resistance: 20 },
+    model3D: 'custom',
+    color: '#f87171',
+    pinCount: 2,
+  },
+  switch: {
+    type: 'switch',
+    label: 'Switch',
+    category: 'electromechanical',
+    terminals: ['a', 'b'],
+    defaultProperties: { closed: 0 },
+    model3D: 'custom',
+    color: '#94a3b8',
+    pinCount: 2,
+  },
+  capacitor: {
+    type: 'capacitor',
+    label: 'Capacitor',
+    category: 'passive',
+    terminals: ['a', 'b'],
+    defaultProperties: { capacitance: 0.0001 },
+    model3D: 'cylinder',
+    color: '#22d3ee',
+    pinCount: 2,
+  },
+  // The app models a battery as a DC voltage source.
+  voltageSource: {
+    type: 'voltageSource',
+    label: 'DC Voltage Source',
+    category: 'active',
+    terminals: ['positive', 'negative'],
+    defaultProperties: { voltage: 5 },
+    model3D: 'cylinder',
+    color: '#22d3ee',
+    pinCount: 2,
+  },
+  ground: {
+    type: 'ground',
+    label: 'Ground',
+    category: 'passive',
+    terminals: ['ground'],
+    defaultProperties: {},
+    model3D: 'custom',
+    color: '#64748b',
+    pinCount: 1,
+  },
+  voltmeter: {
+    type: 'voltmeter',
+    label: 'Voltmeter',
+    category: 'active',
+    terminals: ['positive', 'negative'],
+    defaultProperties: {},
+    model3D: 'box',
+    color: '#64748b',
+    pinCount: 2,
+  },
+  ammeter: {
+    type: 'ammeter',
+    label: 'Ammeter',
+    category: 'active',
+    terminals: ['positive', 'negative'],
+    defaultProperties: {},
+    model3D: 'box',
+    color: '#64748b',
+    pinCount: 2,
+  },
+  ohmmeter: {
+    type: 'ohmmeter',
+    label: 'Ohmmeter',
+    category: 'active',
+    terminals: ['positive', 'negative'],
+    defaultProperties: {},
+    model3D: 'box',
+    color: '#64748b',
+    pinCount: 2,
+  },
+  multimeter: {
+    type: 'multimeter',
+    label: 'Multimeter',
+    category: 'active',
+    terminals: ['positive', 'negative'],
+    defaultProperties: {},
+    model3D: 'box',
+    color: '#64748b',
+    pinCount: 2,
+  },
+  breadboard: {
+    type: 'breadboard',
+    label: 'Breadboard',
+    category: 'passive',
+    terminals: ['a', 'b'],
+    defaultProperties: {},
+    model3D: 'box',
+    color: '#a78bfa',
+    pinCount: 2,
+  },
+
+  // NEW ESSENTIAL COMPONENTS:
+  diode: {
+    type: 'diode',
+    label: 'Diode',
+    category: 'semiconductor',
+    terminals: ['anode', 'cathode'],
+    defaultProperties: { forwardVoltage: 0.7, maxCurrent: 1 },
+    model3D: 'cylinder',
+    color: '#222222',
+    pinCount: 2,
+  },
+  npn_transistor: {
+    type: 'npn_transistor',
+    label: 'NPN Transistor',
+    category: 'semiconductor',
+    terminals: ['base', 'collector', 'emitter'],
+    defaultProperties: { beta: 100 },
+    model3D: 'custom', // Will need a custom half-cylinder shape
+    color: '#111111',
+    pinCount: 3,
+  },
+  inductor: {
+    type: 'inductor',
+    label: 'Inductor',
+    category: 'passive',
+    terminals: ['a', 'b'],
+    defaultProperties: { inductance: 0.01 }, // 10mH
+    model3D: 'cylinder',
+    color: '#8B4513',
+    pinCount: 2,
+  },
+  potentiometer: {
+    type: 'potentiometer',
+    label: 'Potentiometer',
+    category: 'passive',
+    terminals: ['a', 'wiper', 'b'],
+    defaultProperties: { resistance: 10000 },
+    model3D: 'box',
+    color: '#4444FF',
+    pinCount: 3,
+  },
+  push_button: {
+    type: 'push_button',
+    label: 'Push Button',
+    category: 'electromechanical',
+    terminals: ['a', 'b'],
+    defaultProperties: { isPressed: 0 },
+    model3D: 'box',
+    color: '#FF0000',
+    pinCount: 2,
+  },
+};
